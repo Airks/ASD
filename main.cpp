@@ -25,6 +25,7 @@ void placerEnOrdre(ptr_voie , ptr_voie &);
 void inserer (ptr_voie , ptr_voie );
 void placerEnOrdreRec(ptr_voie, ptr_voie &);
 void trierParInsertion(ptr_voie & );
+ptr_voie unSurDeux(ptr_voie & );
 
 // **********************************************************************
 int main(int argc, char const *argv[])
@@ -210,4 +211,18 @@ void trierParInsertion(ptr_voie & chaine){
     chaine = chaineFinale;
 }
 
-// Ce commentaire pour test le commit
+// ***********************************************************************
+ptr_voie unSurDeux(ptr_voie & chaine){
+/* Retourne un chainage contenant la moitié du chaînage passé en paramètre,
+   en en prenant un sur deux.
+*/
+    ptr_voie p1 = chaine;
+    ptr_voie p2;
+    ptr_voie chainePair = nullptr;
+    while( (*p1).autre != nullptr && (*(*p1).autre).autre != nullptr ){
+        p2 = (*p1).autre;
+         (*p1).autre=(*p2).autre;
+        chainePair = ajoutTete( chainePair, (*p2).typeVoie, (*p2).numero, (*p2).traffic);
+        delete p2;
+    }
+}
