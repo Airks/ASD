@@ -40,17 +40,22 @@ int main(int argc, char const *argv[])
     tete = ajoutTete(tete, 'o', 298, 500);
     tete = ajoutTete(tete, 'g', 238, 500);
     tete = ajoutTete(tete, 'x', 456, 500);
+    // tete = ajoutTete(tete, 'n', 548, 921);
 
     cout << "Voici le 1er chaînage: " << endl;
     afficherVoies(tete);
 
-    trierParInsertion(tete);
+    ptr_voie test = unSurDeux(tete);
         
     cout << "Voici la nouvelle chaîne: " << endl;
+    afficherVoies(test);
+
+    cout << "Voici la chaîne précédente: " << endl;
     afficherVoies(tete);
 
     cout << "Suppression des chaînages..." << endl;
     supprimerChainage(tete);
+    supprimerChainage(test);
     cout << "Fait." << endl;
     afficherVoies(tete);
 
@@ -219,10 +224,12 @@ ptr_voie unSurDeux(ptr_voie & chaine){
     ptr_voie p1 = chaine;
     ptr_voie p2;
     ptr_voie chainePair = nullptr;
-    while( (*p1).autre != nullptr && (*(*p1).autre).autre != nullptr ){
+    while ( p1 != nullptr && (*p1).autre != nullptr ){ // comparaison logique paresseuse
         p2 = (*p1).autre;
-         (*p1).autre=(*p2).autre;
-        chainePair = ajoutTete( chainePair, (*p2).typeVoie, (*p2).numero, (*p2).traffic);
+        chainePair = ajoutTete (chainePair, (*p2).typeVoie, (*p2).numero, (*p2).traffic );
+        (*p1).autre = (*p2).autre;
+        p1 = (*p2).autre;
         delete p2;
     }
+    return chainePair;
 }
