@@ -26,6 +26,7 @@ void inserer (ptr_voie , ptr_voie );
 void placerEnOrdreRec(ptr_voie, ptr_voie &);
 void trierParInsertion(ptr_voie & );
 ptr_voie unSurDeux(ptr_voie & );
+ptr_voie fusion(ptr_voie & , ptr_voie & );
 
 // **********************************************************************
 int main(int argc, char const *argv[])
@@ -42,22 +43,29 @@ int main(int argc, char const *argv[])
     tete = ajoutTete(tete, 'x', 456, 500);
     // tete = ajoutTete(tete, 'n', 548, 921);
 
-    cout << "Voici le 1er chaînage: " << endl;
-    afficherVoies(tete);
-
     ptr_voie test = unSurDeux(tete);
+    trierParInsertion(tete);
+    trierParInsertion(test);
         
-    cout << "Voici la nouvelle chaîne: " << endl;
+    cout << "Voici la chaîne 1: " << endl;
     afficherVoies(test);
 
-    cout << "Voici la chaîne précédente: " << endl;
+    cout << "Voici la chaîne 2: " << endl;
     afficherVoies(tete);
+
+    cout << "Fusion des deux..." << endl;
+    ptr_voie fusionnes = fusion(tete, test);
+    cout << "Voici le résultat de la fusion: " << endl;
+    afficherVoies (fusionnes);
+    cout << "Voici les deux chaines précédentes: " << endl;
+    afficherVoies(tete);
+    afficherVoies(test);
 
     cout << "Suppression des chaînages..." << endl;
     supprimerChainage(tete);
     supprimerChainage(test);
+    supprimerChainage(fusionnes);
     cout << "Fait." << endl;
-    afficherVoies(tete);
 
     return 0;
 }
@@ -160,14 +168,16 @@ void afficherT_voie(t_voie voie){
 }
 // **********************************************************************
 void supprimerChainage(ptr_voie & tete){
-    ptr_voie temp = tete;
-    
-    while( (*tete).autre != nullptr){
-        tete = (*tete).autre;
-        delete temp;
-        temp = tete;
+    if (tete != nullptr){
+        ptr_voie temp = tete;
+
+        while( (*tete).autre != nullptr){
+            tete = (*tete).autre;
+            delete temp;
+            temp = tete;
+        }
+        tete = nullptr;
     }
-    tete = nullptr;
 }
 // **********************************************************************
 void placerEnOrdre(ptr_voie p1, ptr_voie & tete){
@@ -197,7 +207,7 @@ void placerEnOrdreRec(ptr_voie p1, ptr_voie & tete){
 
 // ***********************************************************************
 void inserer (ptr_voie p1, ptr_voie p2){
-/* Cette procédure insère p1 entre p2 et l'élément suivant */
+/* Cette procédure insère p1 entre p2 et l'élément suivant, même si p2 est le dernier maillon. */
     (*p1).autre = (*p2).autre;
     (*p2).autre = p1;
 }
@@ -232,4 +242,55 @@ ptr_voie unSurDeux(ptr_voie & chaine){
         delete p2;
     }
     return chainePair;
+}
+
+// ***********************************************************************
+ptr_voie fusion(ptr_voie & p1, ptr_voie & p2){
+/** Prend deux chainages triés et fait la fusion des deux, le résultat étant trié aussi */
+    ptr_voie chaineFinale = nullptr;
+    ptr_voie tempF = nullptr;
+    ptr_voie temp = nullptr;
+
+    //Initialisation de la chaine finale:
+    if (plusPetitOuEgal(p1, p2)){
+        temp = p1;//on le note
+        p1 = (*p1).autre;//on l'enlève de p1
+        chaineFinale = ajoutTete(chaineFinale, (*temp).typeVoie, (*temp).numero, (*temp).traffic );//on le met dans la chaine à rendre
+        tempF= chaineFinale;
+        delete temp;
+    }else{
+        temp = p2;//on le note
+        p2 = (*p2).autre;//on l'enlève de p2
+        chaineFinale = ajoutTete(chaineFinale, (*temp).typeVoie, (*temp).numero, (*temp).traffic );//on le met dans la chaine à rendre
+        tempF = chaineFinale;
+        delete temp;
+    }
+
+    while (p1 != nullptr && p2 != nullptr){//tant que les deux ont des éléments
+        if (plusPetitOuEgal(p1,p2)){//on cherche le plus petit
+            temp = p1;//on le note
+            p1 = (*p1).autre;//on l'enlève de p1
+            inserer(temp,tempF);//on le met dans la chaine à rendre
+            tempF=(*tempF).autre;
+        }else{
+            temp = p2;//on le note
+            p2 = (*p2).autre;//on l'enlève de p2
+            inserer(temp,tempF);//on le met dans la chaine à rendre
+            tempF=(*tempF).autre;
+        }
+    }
+    //tant qu'il reste des éléments dans un seul des deux
+    while (p1 != nullptr){
+        temp = p1;//on le note
+        p1 = (*p1).autre;//on l'enlève de p1
+        inserer(temp,tempF);//on le met dans la chaine à rendre
+        tempF=(*tempF).autre;
+    }
+    while (p2 != nullptr){
+        temp = p2;//on le note
+        p2 = (*p2).autre;//on l'enlève de p2
+        inserer(temp,tempF);//on le met dans la chaine à rendre
+        tempF=(*tempF).autre;
+    }
+    return chaineFinale;
 }
